@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>PhaserTS</title>
+
+    <style type="text/css">
+        body {
+			color: #FFF;
+			margin: 5px;
+			background-color: #002;
+		}
+
+		#zebra_canvas {
+            position: absolute;
+            left:1150px;
+			width: 250px;
+			height:780px;
+
+			border: 1px dashed green;
+        }
+
+		#main_canvas {
+			width: 1380px;
+			height: 780px;
+			border: 1px solid white;
+		}
+
+		#messages {
+			font-family: sans-serif;
+			font-size: 10px;
+			padding: 5px;
+			position: absolute;
+			left: 1220px;
+			top: 15px;
+			color: #FFF;
+			width: 300px;
+			height: 600px;
+			border: 1px solid white;
+		}
+
+		#rname_text {
+			left: 0px;
+			top: 0px;
+			width: 200px;
+		}
+
+		#rname_buildmoderegion {
+			color:#FFF;
+			width: 200px;
+		}
+    </style>
+	<script src="./phaser/build/phaser.js" type='text/javascript'></script>
+    <script src='./zebra.runtime/zebra.js' type='text/javascript'></script>
+</head>
+<body>
+	<div id="zebra_canvas">
+        <canvas id="zCanvas"
+                tabindex="0"
+                style="outline:none;"
+                class="zebracanvas">
+        </canvas>
+    </div>
+
+	<!-- <input type="text" id="rname_text"></input> -->
+	<!-- <span id="rname_buildmoderegion">Selected Region: None</span> -->
+	<div id="main_canvas"></div>
+
+
+
+	<script type="text/javascript">
+		function loadScripts(directory, files) {
+			for (var file of files) {
+				var path = directory + file;
+				var script = document.createElement("script");
+				script.src = path;
+				document.body.appendChild(script);
+				console.log("## Script loaded: " + path);
+			}
+		}
+		loadScripts("", [
+			"zebra.js"
+		]);
+		loadScripts("./typescript_out/", [
+			"init.js",
+		    "DataHandler.js",
+		    "Consoler.js",
+		    "Region.js",
+		    "Graphics.js",
+		    "Civilization.js",
+		    "GraphicsHandler.js"
+		]);
+
+	</script>
+
+
+
+</body>
+</html>
