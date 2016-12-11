@@ -15,7 +15,7 @@ var Region = (function () {
         this.cityGraphic = new CityGraphic(this, cityXY[0], cityXY[1], this.tokenSize);
     }
     Region.prototype.addFromStock = function (qty, cID) {
-        var civ = findCivByID(G.civs, cID);
+        var civ = findCivByID(G.GV.civs, cID);
         if (civ.stock.length() >= qty) {
             civ.stock.moveToGroup(qty, this.units);
         }
@@ -36,17 +36,17 @@ var Region = (function () {
         return '[Region: ' + this.regionID + ',' + this.name + ']';
     };
     Region.prototype.placeTokenSpot = function () {
-        if (G.buildModeOn) {
+        if (G.builder.enabled) {
             this.tokenGraphics.addSpot();
         }
     };
     Region.prototype.placeShipSpot = function () {
-        if (G.buildModeOn) {
+        if (G.builder.enabled) {
             this.shipGraphics.addSpot();
         }
     };
     Region.prototype.changeSize = function () {
-        if (G.buildModeOn) {
+        if (G.builder.enabled) {
             if (this.tokenSize == "normal")
                 this.tokenSize = "small";
             else if (this.tokenSize == "small")
@@ -57,3 +57,27 @@ var Region = (function () {
     };
     return Region;
 }());
+function findRegByName(rlist, n) {
+    for (var e = 0; e < rlist.length; e++) {
+        if (n === rlist[e].name) {
+            return rlist[e];
+        }
+    }
+    return null;
+}
+function findRegByID(rlist, rid) {
+    for (var e = 0; e < rlist.length; e++) {
+        if (rid === rlist[e].regionID) {
+            return rlist[e];
+        }
+    }
+    return null;
+}
+function findCivByID(civList, id) {
+    for (var e = 0; e < civList.length; e++) {
+        if (id === civList[e].civID) {
+            return civList[e];
+        }
+    }
+    return null;
+}

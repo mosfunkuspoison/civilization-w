@@ -12,18 +12,21 @@
         "outDir": "./typescript_out"
     },
     "filesGlob": [
-        "./phaser-2.4.8/typescript/phaser.d.ts",
+        "./phaser/typescript/phaser.d.ts",
+        "./EZGUI-master/dist/EZGUI.d.ts",
         "./typescript/**/*.ts",
         "!./node_modules/**/*.ts"
     ],
     "files": [
-        "./phaser-2.4.8/typescript/phaser.d.ts",
+        "./phaser/typescript/phaser.d.ts",
+        "./EZGUI-master/dist/EZGUI.d.ts",
+        "./typescript/ActiveObjects.ts",
         "./typescript/Civilization.ts",
         "./typescript/Consoler.ts",
         "./typescript/DataHandler.ts",
-        "./typescript/Graphics.ts",
         "./typescript/GraphicsHandler.ts",
         "./typescript/init.ts",
+        "./typescript/jsUtil.ts",
         "./typescript/Region.ts"
     ],
     "atom": {

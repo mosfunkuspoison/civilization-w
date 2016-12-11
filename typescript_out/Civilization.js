@@ -4,9 +4,9 @@ var Civilization = (function () {
         this.name = civdata[1];
         this.adjName = civdata[2];
         this.isInGame = civdata[3];
-        this.tokenLimit = G.tokenLimit;
-        this.shipLimit = G.shipLimit;
-        this.cityLimit = G.cityLimit;
+        this.tokenLimit = G.GV.tokenLimit;
+        this.shipLimit = G.GV.shipLimit;
+        this.cityLimit = G.GV.cityLimit;
         this.stock = new UnitGroup();
         this.treasury = new UnitGroup();
         for (var i = 0; i < this.tokenLimit; i++) {
@@ -67,22 +67,4 @@ var UnitGroup = (function () {
         return pull;
     };
     return UnitGroup;
-}());
-var Token = (function () {
-    function Token(civ) {
-        this.civ = civ;
-        this.movesLeft = 0;
-    }
-    return Token;
-}());
-var Ship = (function () {
-    function Ship(civ) {
-        this.civ = civ;
-        this.containsTokens = [];
-        this.movesLeft = 0;
-    }
-    Ship.prototype.addToken = function (t) {
-        this.containsTokens.push(t);
-    };
-    return Ship;
 }());

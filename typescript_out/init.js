@@ -3,44 +3,111 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var guiObjJSON = {
+    id: 'mainWindow',
+    component: 'Window',
+    header: { id: 'ttl', skin: 'blueheader', position: { x: 0, y: 0 }, height: 40, text: 'Title' },
+    draggable: true,
+    padding: 4,
+    position: { x: 40, y: 40 },
+    width: 600,
+    height: 500,
+    layout: [1, 3],
+    children: [
+        {
+            component: 'Layout',
+            position: { x: 0, y: 0 },
+            width: 500,
+            height: 140,
+            layout: [2, 1],
+            children: [
+                {
+                    id: 'btn1',
+                    text: 'btn',
+                    font: {
+                        size: '42px',
+                        family: 'Arial'
+                    },
+                    component: 'Button',
+                    skin: 'bluebutton',
+                    position: 'center',
+                    width: 190,
+                    height: 80
+                },
+                {
+                    component: 'Layout',
+                    position: { x: 0, y: 0 },
+                    width: 250,
+                    height: 140,
+                    layout: [1, 4],
+                    children: [
+                        { id: 'radio1', text: 'choice 1', component: 'Radio', group: 1, position: 'center', width: 30, height: 30 },
+                        { id: 'radio2', text: 'choice 2', component: 'Radio', group: 1, position: 'center', width: 30, height: 30 },
+                        { id: 'radio3', text: 'choice 3', component: 'Radio', group: 1, position: 'center', width: 30, height: 30 },
+                        { id: 'radio4', text: 'choice 4', component: 'Radio', group: 1, position: 'center', width: 30, height: 30 }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'hlist1',
+            component: 'List',
+            padding: 3,
+            position: 'center',
+            width: 400,
+            height: 150,
+            layout: [4, null],
+            children: [
+                { id: 'sc1', component: 'Button', position: 'center', width: 90, height: 120 },
+                null,
+                { id: 'sc2', component: 'Button', position: 'center', width: 90, height: 120 },
+                { id: 'sc3', component: 'Button', position: 'center', width: 90, height: 120 },
+                { id: 'sc4', component: 'Button', position: 'center', width: 90, height: 120 },
+                { id: 'sc5', component: 'Button', position: 'center', width: 90, height: 120 }
+            ]
+        },
+        {
+            id: 'btn2',
+            component: 'Checkbox',
+            position: 'center',
+            text: 'Checkbox',
+            width: 30,
+            height: 30
+        }
+    ]
+};
 var SW = {
-    drawLayer: { obj: null, type: "checkbox", active: true, v: true, label: "drawLayer" },
-    cameraDrag: { obj: null, type: "checkbox", active: true, v: true, label: "cameraDrag" },
-    buildMode: { obj: null, type: "checkbox", active: true, v: true, label: "buildMode" },
-    buildLandConn: { obj: null, type: "checkbox", active: true, v: false, label: "landConnBuild" },
-    buildSeaConn: { obj: null, type: "checkbox", active: true, v: false, label: "seaConnBuild" },
-    buildingRegion: { obj: null, obj2: null, type: "textfield", active: false, v: "", label: "Building Region" },
-    buttonnn: { obj: null, obj2: null, type: "button", active: true, v: "Button thing" },
-    consoleLabel: { obj: null, type: "label", active: true, v: "Console Output:" },
-    consoleOutput: { obj: null, type: "multitext", active: true, v: "Console Output" }
+    drawLayer: { extObj: null, type: "checkbox", active: true, v: true, label: "drawLayer" },
+    cameraDrag: { extObj: null, type: "checkbox", active: true, v: true, label: "cameraDrag" },
 };
 var G = {
     regionListJSON: null,
     game: null,
-    main_canvas: document.getElementById("main_canvas"),
+    canvas: document.getElementById("main_canvas"),
     canvasDims: [1380, 780],
-    zebraCanvas: document.getElementById("zebra_canvas"),
-    zebraEnabled: true,
     keys: null,
+    EZGUIContainer: null,
     console: null,
     mcamera: null,
-    regions: [],
-    civs: [],
-    tokenLimit: 55,
-    shipLimit: 4,
-    cityLimit: 9,
     gfxHandler: null,
     dataHandler: null,
-    buildModeRegion: null,
-    newConnList: [],
-    buildModeTokenSpot: null,
-    regionNameElement: document.getElementById("rname_text"),
-    bmregionNameElement: document.getElementById("rname_buildmoderegion"),
-    buildModeOn: true,
     drawLayerOn: true,
     cameraDragOn: true,
-    landConnBuildOn: false,
-    seaConnBuildOn: false
+    builder: {
+        enabled: true,
+        currentRegion: null,
+        currentTokenSpot: null,
+        newConnList: [],
+        landConnOn: false,
+        seaConnOn: false
+    },
+    GV: {
+        regions: [],
+        civs: [],
+        tokenLimit: 55,
+        shipLimit: 4,
+        cityLimit: 9
+    },
 };
 window.onload = function () {
     var gm = new PhaserCivApp();
@@ -55,20 +122,24 @@ window.onload = function () {
 };
 var PhaserCivApp = (function () {
     function PhaserCivApp() {
-        G.zebraCanvas.hidden = false;
-        if (G.zebraEnabled) {
-            zebraStart(SW);
-        }
-        G.game = new Phaser.Game(G.canvasDims[0], G.canvasDims[1], Phaser.AUTO, 'main_canvas');
+        G.game = new Phaser.Game(G.canvasDims[0], G.canvasDims[1], Phaser.AUTO, G.canvas.getAttribute('id'));
         G.game.state.add("GameRunningState", GameRunningState, false);
         G.game.state.start("GameRunningState", true, true);
+        EZGUI.renderer = G.game.renderer;
+        EZGUI.Theme.load(['./EZGUI-master/assets/kenney-theme/kenney-theme.json'], function () {
+            G.EZGUIContainer = EZGUI.create(guiObjJSON, 'kenney');
+            EZGUI.components.btn1.on('click', function (event) {
+                console.log('clicked', event);
+                EZGUI.components.mainWindow.position.x += 20;
+            });
+        });
     }
     return PhaserCivApp;
 }());
 var GameRunningState = (function (_super) {
     __extends(GameRunningState, _super);
     function GameRunningState() {
-        _super.call(this);
+        return _super.call(this) || this;
     }
     GameRunningState.prototype.preload = function () {
         this.game.load.image('mapSectionA', 'assets/NewCivmapSectionA.png');
@@ -114,151 +185,17 @@ var GameRunningState = (function (_super) {
             z: this.game.input.keyboard.addKey(Phaser.Keyboard.Z),
             d: this.game.input.keyboard.addKey(Phaser.Keyboard.D)
         };
-        G.keys.num1.onDown.add(placeTokenSpot, this);
-        G.keys.num2.onDown.add(placeShipSpot, this);
-        G.keys.num3.onDown.add(placeRegion, this);
-        G.keys.num5.onDown.add(changeSize, this);
-        G.keys.num6.onDown.add(deleteTokenSpot, this);
-        G.keys.num8.onDown.add(startLandConnList, this);
-        G.keys.num9.onDown.add(finishLandConnList, this);
-        G.keys.num0.onDown.add(G.dataHandler.exportGameData, this);
         G.keys["z"].onDown.add(function () {
-            if (G.zebraEnabled) {
-                G.zebraCanvas.hidden = !G.zebraCanvas.hidden;
-            }
+            EZGUI.components.mainWindow.visible = !EZGUI.components.mainWindow.visible;
         }, this);
         G.keys["d"].onDown.add(function () {
-            console.log("**** debug key pressed");
+            console.log("**** draw layer key pressed");
             console.log(SW.drawLayer.v);
         }, this);
     };
     return GameRunningState;
 }(Phaser.State));
-function getMouse() {
+function getMousePos() {
     return [this.game.input.mousePointer.position.x + this.game.camera.x,
         this.game.input.mousePointer.position.y + this.game.camera.y];
-}
-function placeRegion() {
-    if (G.buildModeOn) {
-        console.log("place region:" + G.regionNameElement.value);
-        G.buildModeRegion = new Region(G.regions.length + 1, G.regionNameElement.value, -1, 0, 0, [], [], "normal", this.getMouse(), [], [], []);
-        G.regionNameElement.value = "";
-        G.bmregionNameElement.innerHTML = "Selected Region: " + G.buildModeRegion.name;
-        G.regions.push(G.buildModeRegion);
-    }
-}
-function placeTokenSpot() {
-    if (G.buildModeRegion && G.buildModeOn) {
-        G.buildModeRegion.addSpot(0);
-    }
-}
-function placeShipSpot() {
-    if (G.buildModeRegion && G.buildModeOn) {
-        G.buildModeRegion.addSpot(1);
-    }
-}
-function deleteTokenSpot() {
-    if (G.buildModeTokenSpot && G.buildModeOn) {
-        G.buildModeTokenSpot.sprite.x = -1000;
-        G.buildModeTokenSpot.sprite.y = -1000;
-    }
-}
-function changeSize() {
-    if (G.buildModeRegion && G.buildModeOn) {
-        G.buildModeRegion.changeSize();
-        console.log(G.buildModeRegion.toString() + "    size: " + G.buildModeRegion.tokenSize);
-    }
-}
-function startSeaConnList() {
-    if (G.buildModeOn && !G.seaConnBuildOn) {
-        G.seaConnBuildOn = true;
-        G.newConnList = [];
-        G.bmregionNameElement.innerHTML = "Building sea conn's for region: " + G.buildModeRegion.name;
-    }
-}
-function startLandConnList() {
-    if (G.buildModeOn && !G.seaConnBuildOn) {
-        G.seaConnBuildOn = true;
-        G.newConnList = [];
-        G.bmregionNameElement.innerHTML = "Building sea conn's for region: " + G.buildModeRegion.name;
-    }
-}
-function finishSeaConnList() {
-    if (G.buildModeOn && G.seaConnBuildOn) {
-        G.seaConnBuildOn = false;
-        for (var n = 0; n < G.newConnList.length; n++) {
-            G.buildModeRegion.seaConn.push(G.newConnList[n]);
-        }
-        G.newConnList = [];
-        G.bmregionNameElement.innerHTML = "Saving sea connections for region: " + G.buildModeRegion.name;
-        G.buildModeRegion.updateGraphics();
-    }
-}
-function finishLandConnList() {
-    if (G.buildModeOn && G.seaConnBuildOn) {
-        G.seaConnBuildOn = false;
-        for (var n = 0; n < G.newConnList.length; n++) {
-            G.buildModeRegion.landConn.push(G.newConnList[n]);
-        }
-        G.newConnList = [];
-        G.bmregionNameElement.innerHTML = "Saving land connections for region: " + G.buildModeRegion.name;
-        G.buildModeRegion.updateGraphics();
-    }
-}
-function findRegByName(rlist, n) {
-    for (var e = 0; e < rlist.length; e++) {
-        if (n === rlist[e].name) {
-            return rlist[e];
-        }
-    }
-    return null;
-}
-function findRegByID(rlist, rid) {
-    for (var e = 0; e < rlist.length; e++) {
-        if (rid === rlist[e].regionID) {
-            return rlist[e];
-        }
-    }
-    return null;
-}
-function findCivByID(civList, id) {
-    for (var e = 0; e < civList.length; e++) {
-        if (id === civList[e].civID) {
-            return civList[e];
-        }
-    }
-    return null;
-}
-function arrayContains(arr, n) {
-    for (var i in arr) {
-        if (arr[i] === n)
-            return true;
-    }
-    return false;
-}
-function padTwoDigitNum(n) {
-    if (n <= 0)
-        return '  ';
-    else if (n < 10)
-        return ' ' + n;
-    else
-        return '' + n;
-}
-function arrayIntersection(a, b) {
-    var ai = 0, bi = 0;
-    var result = new Array();
-    while (ai < a.length && bi < b.length) {
-        if (a[ai] < b[bi]) {
-            ai++;
-        }
-        else if (a[ai] > b[bi]) {
-            bi++;
-        }
-        else {
-            result.push(a[ai]);
-            ai++;
-            bi++;
-        }
-    }
-    return result;
 }

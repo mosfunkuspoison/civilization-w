@@ -33,7 +33,7 @@ class Region
 	}
 
 	addFromStock (qty, cID) {
-		var civ = findCivByID(G.civs, cID);
+		var civ = findCivByID(G.GV.civs, cID);
 		if(civ.stock.length() >= qty) {
 			civ.stock.moveToGroup(qty, this.units);
 		}
@@ -59,19 +59,19 @@ class Region
 	}
 
 	placeTokenSpot() {
-		if(G.buildModeOn) {
+		if(G.builder.enabled) {
 			this.tokenGraphics.addSpot();
 		}
 	}
 
 	placeShipSpot() {
-		if(G.buildModeOn) {
+		if(G.builder.enabled) {
 			this.shipGraphics.addSpot();
 		}
 	}
 
 	changeSize () {
-		if(G.buildModeOn) {
+		if(G.builder.enabled) {
 			if(this.tokenSize == "normal")
 				this.tokenSize = "small";
 			else if(this.tokenSize == "small")
@@ -81,4 +81,28 @@ class Region
 		}
 	}
 
+}
+
+// findByName([Region], string) -> Region
+function findRegByName(rlist, n) {
+    for (var e = 0; e < rlist.length; e++) {
+        if (n === rlist[e].name) { return rlist[e]; }
+    }
+    return null;
+}
+
+// regionByID([Region], number) -> Region
+function findRegByID(rlist, rid) {
+    for (var e = 0; e < rlist.length; e++) {
+        if (rid === rlist[e].regionID) { return rlist[e]; }
+    }
+    return null;
+}
+
+// civByID([Civilization], number) -> Civilization
+function findCivByID(civList, id) {
+    for (var e = 0; e < civList.length; e++) {
+        if (id === civList[e].civID) { return civList[e]; }
+    }
+    return null;
 }

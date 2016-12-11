@@ -16,9 +16,9 @@ class Civilization {
 		this.adjName = civdata[2];			// "Carthaginian"
 		this.isInGame = civdata[3];			// don't bother making units, etc if false
 
-		this.tokenLimit = G.tokenLimit;
-		this.shipLimit = G.shipLimit;
-		this.cityLimit = G.cityLimit;
+		this.tokenLimit = G.GV.tokenLimit;
+		this.shipLimit = G.GV.shipLimit;
+		this.cityLimit = G.GV.cityLimit;
 
 		this.stock = new UnitGroup();
 		this.treasury = new UnitGroup();
@@ -131,37 +131,4 @@ class UnitGroup {
 		return pull;
 	}
 
-}
-
-
-
-
-class Token {
-	civ: Civilization;
-	movesLeft: number;
-
-	constructor(civ) {
-		this.civ = civ;
-		this.movesLeft = 0;
-	}
-
-}
-
-
-
-
-class Ship {
-	civ: Civilization;
-	movesLeft: number;
-	containsTokens: Array<Token>;
-
-	constructor(civ) {
-		this.civ = civ;
-		this.containsTokens = [];
-		this.movesLeft = 0;
-	}
-
-	addToken(t) {
-		this.containsTokens.push(t);
-	}
 }
